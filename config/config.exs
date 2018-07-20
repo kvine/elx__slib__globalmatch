@@ -21,7 +21,7 @@ use Mix.Config
 #     config :logger, level: :info
 #
 
-config :elx__slib__globalmatch, vs_mode_ids: [0,1,2,3,4,5,6,7,8,9]
+config :elx__slib, vs_mode_ids: [0,1,2,3,4,5,6,7,8,9]
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
