@@ -1,4 +1,4 @@
-defmodule Game.MatchRoom do
+defmodule Game.Global.MatchRoom do
   require Logger
   use GenServer
 
@@ -91,19 +91,19 @@ defmodule Game.MatchRoom do
 
   
   def handle_cast({:enter,request},state) do 
-      Game.MatchRoomHelper.handle_match_room_cast({:enter,request},state)
+      Game.Global.MatchRoomHelper.handle_match_room_cast({:enter,request},state)
   end
 
   def handle_cast({:active,request},state) do 
-      Game.MatchRoomHelper.handle_match_room_cast({:active,request},state)
+      Game.Global.MatchRoomHelper.handle_match_room_cast({:active,request},state)
   end
 
   def handle_cast({:confirm,request},state) do 
-      Game.MatchRoomHelper.handle_match_room_cast({:confirm,request},state)
+      Game.Global.MatchRoomHelper.handle_match_room_cast({:confirm,request},state)
   end
 
   def handle_cast({:leave,request},state) do 
-      Game.MatchRoomHelper.handle_match_room_cast({:leave,request},state)
+      Game.Global.MatchRoomHelper.handle_match_room_cast({:leave,request},state)
   end
 
 
@@ -136,11 +136,11 @@ defmodule Game.MatchRoom do
   end
 
   def handle_info({:timeout, timer, :handle_timer},state) do 
-      Game.MatchRoomHelper.handle_info({:timeout,timer,:handle_timer},state)
+      Game.Global.MatchRoomHelper.handle_info({:timeout,timer,:handle_timer},state)
   end
 
   def handle_info({:timeout, timer, :confirm_timer},state) do 
-      Game.MatchRoomHelper.handle_info({:timeout,timer,:confirm_timer},state)
+      Game.Global.MatchRoomHelper.handle_info({:timeout,timer,:confirm_timer},state)
   end
 
 

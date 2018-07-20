@@ -1,4 +1,4 @@
-defmodule Game.GlobalMatch.Supervisor do
+defmodule Game.Global.Match.Supervisor do
 	use Supervisor
 	require  Logger
 	
@@ -8,7 +8,7 @@ defmodule Game.GlobalMatch.Supervisor do
  
 	def init(nil) do
 		
-		match_room_sup_spec=  supervisor(Game.MatchRoom.Supervisor, [Game.MatchRoom], restart: :permanent)
+		match_room_sup_spec=  supervisor(Game.Global.MatchRoom.Supervisor, [Game.Global.MatchRoom], restart: :permanent)
 		
 		children=[
 				match_room_sup_spec

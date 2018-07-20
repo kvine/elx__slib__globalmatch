@@ -1,4 +1,4 @@
-defmodule  Game.MatchRoomHelper do
+defmodule  Game.Global.MatchRoomHelper do
     require Logger
 
    
@@ -109,8 +109,9 @@ defmodule  Game.MatchRoomHelper do
         id=request.id
         Logger.info("with_player, id: #{inspect id} confirm, ok! request= #{inspect request}")
         now= Time.Util.curr_mills()
+        confirm_list= Enum.reverse(state.confirm_list)
         {confirm_list, playing_list}
-                = List.foldr(state.confirm_list,{[],[]},fn(x,{acc1,acc2})-> 
+                = List.foldl(confirm_list,{[],[]},fn(x,{acc1,acc2})-> 
                                 {item1,item2}=x
                                 case item1.id ==  id || item2.id == id do 
                                     false -> 
@@ -140,8 +141,9 @@ defmodule  Game.MatchRoomHelper do
         id=request.id
         Logger.info("with_robot, id: #{inspect id} confirm, ok! request= #{inspect request}")
         now= Time.Util.curr_mills()
+        confirm_with_robot_list= Enum.reverse(state.confirm_with_robot_list)
         {confirm_with_robot_list, playing_with_robot_list}
-                = List.foldr(state.confirm_with_robot_list,{[],[]},fn(x,{acc1,acc2})-> 
+                = List.foldl(confirm_with_robot_list,{[],[]},fn(x,{acc1,acc2})-> 
                                 case x.id ==  id do 
                                     false -> 
                                         {[x| acc1], acc2}
@@ -171,8 +173,9 @@ defmodule  Game.MatchRoomHelper do
 
     # -> {confirm_list, re_wait_list}
     def leave_in_confirm_list(vs_mode_id,list,id) do 
-        now= Time.Util.curr_mills()
-        List.foldr(list,{[],[]},fn(x,{acc1,acc2})-> 
+        _now= Time.Util.curr_mills()
+        list= Enum.reverse(list)
+        List.foldl(list,{[],[]},fn(x,{acc1,acc2})-> 
             {item1,item2}=x
             case item1.id == id or item2.id == id do 
                 false -> 
@@ -266,7 +269,8 @@ defmodule  Game.MatchRoomHelper do
 
     # -> list
     def delete_item(list,id) do 
-        List.foldr(list,[],fn(x,acc)-> 
+        list= Enum.reverse(list)
+        List.foldl(list,[],fn(x,acc)-> 
                     case x.id == id do 
                         true -> 
                             acc
@@ -296,7 +300,8 @@ defmodule  Game.MatchRoomHelper do
         now = Time.Util.curr_mills()
         max_unactive_time = Application.get_env(:global_match,:mr_max_unactive_time,30_000)
         check_active_time = Application.get_env(:global_match,:mr_check_active_time,10_000)
-        List.foldr(list,[],fn(x,acc)-> 
+        list= Enum.reverse(list)
+        List.foldl(list,[],fn(x,acc)-> 
             case x.active_time + max_unactive_time < now do 
                     true -> 
                         acc 
@@ -331,7 +336,8 @@ defmodule  Game.MatchRoomHelper do
     def check_timeout_confirm(vs_mode_id, list) do 
         now= Time.Util.curr_mills()
         max_unconfirm_time= Application.get_env(:global_match,:mr_max_unconfirm_time,3_000)
-        List.foldr(list,{[],[]},fn(x,{acc1,acc2})-> 
+        list= Enum.reverse(list)
+        List.foldl(list,{[],[]},fn(x,{acc1,acc2})-> 
                     {item1,item2}=x
                     timeout1=  (item1.confirm_time + max_unconfirm_time < now) and (not item1.is_confirmed)
                     timeout2=  (item2.confirm_time + max_unconfirm_time < now) and (not item2.is_confirmed)
@@ -360,7 +366,7 @@ defmodule  Game.MatchRoomHelper do
     end
 
 
-    def handle_info({:timeout,timer,:handle_timer}, state) do 
+    def handle_info({:timeout,_timer,:handle_timer}, state) do 
         
         # Logger.error("timeout: handle_timer")
         vs_mode_id=state.vs_mode_id
@@ -369,7 +375,7 @@ defmodule  Game.MatchRoomHelper do
         playing_with_robot_list= delete_unactive_item(vs_mode_id,state.playing_with_robot_list)
         ## 匹配的相关参数
         args=%{user_cnt: state.user_cnt}
-        {wait_list,confirm_list, confirm_with_robot_list }= Game.Match.match(vs_mode_id,wait_list,args) 
+        {wait_list,confirm_list, confirm_with_robot_list }= Game.Global.Match.match(vs_mode_id,wait_list,args) 
         confirm_list = Enum.concat(confirm_list,state.confirm_list)
         confirm_with_robot_list = Enum.concat(confirm_with_robot_list,state.confirm_with_robot_list)
         ## 重启定时器
@@ -398,7 +404,7 @@ defmodule  Game.MatchRoomHelper do
                         }}
     end
 
-    def handle_info({:timeout,timer,:confirm_timer},state) do 
+    def handle_info({:timeout,_timer,:confirm_timer},state) do 
         # Logger.error("timeout: confirm_timer")
         {confirm_list, re_wait_list}= check_timeout_confirm(state.vs_mode_id, state.confirm_list)
         wait_list= Enum.concat(re_wait_list,state.wait_list)

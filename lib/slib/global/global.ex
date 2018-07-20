@@ -3,7 +3,7 @@ defmodule Game.Global do
     @doc """
             全局模块
         """
-    @match_room_module "Elixir.Game.MatchRoom"
+    @match_room_module "Elixir.Game.Global.MatchRoom"
     
     # -> string 
     def get_match_room_name(vs_mode_id) do 
@@ -25,8 +25,10 @@ defmodule Game.Global do
     # Game.Global.get_all_room_user_cnt()
     # -> [{id,integer}] | {:error,reason}
     def get_all_room_user_cnt() do 
-        vs_mode_ids=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-        List.foldr(vs_mode_ids,[],fn(x,acc)->
+        # vs_mode_ids=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+        vs_mode_ids= Application.get_env(:elx__slib__globalmatch, :vs_mode_ids, [0,1,2,3,4,5,6,7,8,9,10])
+        vs_mode_ids=Enum.reverse(vs_mode_ids)
+        List.foldl(vs_mode_ids,[],fn(x,acc)->
                         [get_room_user_cnt(x)|acc]
                      end)
     end

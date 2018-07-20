@@ -1,4 +1,4 @@
-defmodule Game.MatchRoom.Supervisor do
+defmodule Game.Global.MatchRoom.Supervisor do
     use Elixir.Supervisor
 
     def start_link(module) do
@@ -15,7 +15,7 @@ defmodule Game.MatchRoom.Supervisor do
         vs_mode_ids=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
         # vs_mode_ids=[0,1]
         children=  for i<- vs_mode_ids do 
-                    id= Game.MatchRoom.name(i)
+                    id= Game.Global.MatchRoom.name(i)
                     worker(module,[%{vs_mode_id: i}], restart: :permanent, id: id)
                     end
         supervise(children, strategy: :one_for_one)
