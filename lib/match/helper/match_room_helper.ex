@@ -335,7 +335,7 @@ defmodule  Game.Global.MatchRoomHelper do
     # -> {confirm_list, re_wait_list}
     def check_timeout_confirm(:with_player, vs_mode_id, list) do 
         now= Time.Util.curr_mills()
-        max_unconfirm_time= Application.get_env(:global_match,:mr_max_unconfirm_time,3_000)
+        max_unconfirm_time= Application.get_env(:global_match,:mr_max_unconfirm_time,5_000)
         list= Enum.reverse(list)
         List.foldl(list,{[],[]},fn(x,{acc1,acc2})-> 
                     {item1,item2}=x
@@ -371,7 +371,7 @@ defmodule  Game.Global.MatchRoomHelper do
     # -> {confirm_list, re_wait_list}
     def check_timeout_confirm(:with_robot,vs_mode_id,list) do 
         now= Time.Util.curr_mills()
-        max_unconfirm_time= Application.get_env(:global_match,:mr_max_unconfirm_time,3_000)
+        max_unconfirm_time= Application.get_env(:global_match,:mr_max_unconfirm_time,5_000)
         list= Enum.reverse(list)
         List.foldl(list,{[],[]},fn(x,{acc1,acc2})-> 
                     item1= x
@@ -380,6 +380,7 @@ defmodule  Game.Global.MatchRoomHelper do
                         false -> 
                             {[x|acc1],acc2}
                         true -> 
+                            Logger.info("confirm_time timeout, confirm_time=#{inspect item1.confirm_time}")
                             # 玩家超时，移除掉
                             {acc1,acc2}
                     end
