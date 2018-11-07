@@ -50,17 +50,12 @@ defmodule Game.Global.MatchRoom do
       confirm_time： 匹配确认开始时间
       is_confirmed： 是否已经确认
       user_data: 玩家数据 ，玩家在确认匹配的时候传入
-      room_init_data: 房间初始化数据
-        ％｛
-        assign_lv_id：指定关卡id
-        lv_id: 关卡id
-        with_robot: 是否和robot进行比赛
-        mirror_id: 和robot进行比赛时，robot的镜像id
-        ｝
+      room_init_data: 房间初始化数据，玩家在确认匹配的时候传入
       wait_robot_time: 等待机器人时间（当一定时间匹配不到玩家后，进入等待robot状态，超过一定时间后分配robot)
     }
 
     match_data:%{
+      //该部分数据可以根据需要调整（由玩家在匹配时传入）
       lv: 玩家等级
       cup: 玩家杯数
       league_lv: 联盟等级
@@ -68,10 +63,11 @@ defmodule Game.Global.MatchRoom do
       win10_cnt: 玩家最近10场比赛赢的次数
       play_all_cnt: 玩家总共参加的比赛次数
       level_ids: 玩家可以参加的比赛id（用于锦标赛）
-      level_ids_length: 用于匹配
+      level_ids_length: 用于锦标赛匹配
+      spec_data: 指定的匹配相关的数据（会影响room_init_data) 
     }
   """
-  def init(%{vs_mode_id: vs_mode_id} = data) do
+  def init(%{vs_mode_id: vs_mode_id} = _data) do
     Logger.info(" match room init pid=: #{inspect(self())}")
     mr_handle_timer_time= Application.get_env(:global_match,:mr_handle_timer_time,5_000)
     mr_confirm_timer_time= Application.get_env(:global_match,:mr_confirm_timer_time,3_000)

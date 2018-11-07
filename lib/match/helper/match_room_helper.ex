@@ -28,11 +28,7 @@ defmodule  Game.Global.MatchRoomHelper do
                         confirm_time: 0,
                         is_confirmed: false,
                         user_data: nil,
-                        room_init_data: %{  assign_lv_id: false, 
-                                            lv_id: -1,
-                                            with_robot: false,
-                                            mirror_id: ""
-                                        },
+                        room_init_data: nil,
                         wait_robot_time: -1
                     }
                 wait_list=[item| state.wait_list]
@@ -106,7 +102,7 @@ defmodule  Game.Global.MatchRoomHelper do
 
      # -> {:noreply, state}
      def do_confirm(:with_player,request, state) do 
-        id=request.id
+        %{id: id, room_init_data: room_init_data} = request
         Logger.info("with_player, id: #{inspect id} confirm, ok! request= #{inspect request}")
         now= Time.Util.curr_mills()
         confirm_list= Enum.reverse(state.confirm_list)
@@ -119,7 +115,9 @@ defmodule  Game.Global.MatchRoomHelper do
                                     true -> 
                                         ### 如果两个都准备好了，就开始比赛
                                         item1= update_confirm_item(request,item1)
+                                        item1= %{item1| room_init_data: room_init_data}
                                         item2=update_confirm_item(request,item2)
+                                        item2= %{item2| room_init_data: room_init_data}
                                         case item1.is_confirmed and item2.is_confirmed do 
                                             false -> 
                                                 {[{item1,item2} | acc1], acc2}
@@ -138,7 +136,7 @@ defmodule  Game.Global.MatchRoomHelper do
 
 
     def do_confirm(:with_robot,request,state) do 
-        id=request.id
+        %{id: id, room_init_data: room_init_data} = request
         Logger.info("with_robot, id: #{inspect id} confirm, ok! request= #{inspect request}")
         now= Time.Util.curr_mills()
         confirm_with_robot_list= Enum.reverse(state.confirm_with_robot_list)
@@ -148,13 +146,7 @@ defmodule  Game.Global.MatchRoomHelper do
                                     false -> 
                                         {[x| acc1], acc2}
                                     true -> 
-                                        ## 跟新匹配信息
-                                        room_init_data= %{x.room_init_data| 
-                                                            assign_lv_id: true,
-                                                            lv_id: request.lv_id,
-                                                            with_robot: true,
-                                                            mirror_id: request.mirror_id
-                                                        }
+                                        ## 更新匹配信息
                                         item1= update_confirm_item(request,x)
                                         item1= %{item1| room_init_data: room_init_data}
                                         item2= nil
