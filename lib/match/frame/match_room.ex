@@ -51,6 +51,7 @@ defmodule Game.Global.MatchRoom do
       is_confirmed： 是否已经确认
       user_data: 玩家数据 ，玩家在确认匹配的时候传入
       room_init_data: 房间初始化数据，玩家在确认匹配的时候传入
+      is_start_wait_robot: 是否启动等待机器人
       wait_robot_time: 等待机器人时间（当一定时间匹配不到玩家后，进入等待robot状态，超过一定时间后分配robot)
     }
 

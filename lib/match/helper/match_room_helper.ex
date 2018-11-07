@@ -29,6 +29,7 @@ defmodule  Game.Global.MatchRoomHelper do
                         is_confirmed: false,
                         user_data: nil,
                         room_init_data: nil,
+                        is_start_wait_robot: false,
                         wait_robot_time: -1
                     }
                 wait_list=[item| state.wait_list]
@@ -361,7 +362,7 @@ defmodule  Game.Global.MatchRoomHelper do
 
 
     # -> {confirm_list, re_wait_list}
-    def check_timeout_confirm(:with_robot,vs_mode_id,list) do 
+    def check_timeout_confirm(:with_robot,_vs_mode_id,list) do 
         now= Time.Util.curr_mills()
         max_unconfirm_time= Application.get_env(:global_match,:mr_max_unconfirm_time,5_000)
         list= Enum.reverse(list)
