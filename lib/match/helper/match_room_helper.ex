@@ -29,8 +29,7 @@ defmodule  Game.Global.MatchRoomHelper do
                         is_confirmed: false,
                         user_data: nil,
                         room_init_data: nil,
-                        is_start_wait_robot: false,
-                        wait_robot_time: -1
+                        start_wait_time: now,
                     }
                 wait_list=[item| state.wait_list]
                 Logger.info("wait list2= #{inspect wait_list}")
@@ -137,6 +136,15 @@ defmodule  Game.Global.MatchRoomHelper do
 
 
     def do_confirm(:with_robot,request,state) do 
+        case Map.has_key?(request,:error) do 
+                true -> 
+                    do_confirm(:with_robot,:error,request,state)
+                false -> 
+                    do_confirm(:with_robot,:ok,request,state)
+        end
+    end
+
+    def do_confirm(:with_robot,:ok,request,state) do 
         %{id: id, room_init_data: room_init_data} = request
         Logger.info("with_robot, id: #{inspect id} confirm, ok! request= #{inspect request}")
         now= Time.Util.curr_mills()
@@ -159,6 +167,38 @@ defmodule  Game.Global.MatchRoomHelper do
         playing_with_robot_list = Enum.concat(playing_with_robot_list,state.playing_with_robot_list)
         {:noreply,%{state| confirm_with_robot_list: confirm_with_robot_list,
                          playing_with_robot_list: playing_with_robot_list}}
+    end
+
+    ## 把该玩家重新放入到匹配队列中
+    def do_confirm(:with_robot,:error,request,state) do 
+        %{id: id } = request
+        now= Time.Util.curr_mills()
+        confirm_with_robot_list= Enum.reverse(state.confirm_with_robot_list)
+        {confirm_with_robot_list,item}= 
+                List.foldl(confirm_with_robot_list,{[],nil},fn(x,{acc1,acc2})-> 
+                    case x.id == id do 
+                        false -> 
+                            {[x|acc1],acc2}
+                        true -> 
+                            {acc1,x}
+                    end
+                end)
+        wait_list= case item do 
+                    nil -> 
+                        state.wait_list
+                    _ -> 
+                        ## 重新放回匹配队列
+                        item = put_in(item.user_data,nil)
+                        item=%{item| 
+                                is_confirmed: false,
+                                start_wait_time: now
+                            }
+                        [item|state.wait_list]
+                end
+        {:noreply,%{state| 
+                confirm_with_robot_list: confirm_with_robot_list,
+                wait_list: wait_list
+            }}
     end
 
 
@@ -313,9 +353,12 @@ defmodule  Game.Global.MatchRoomHelper do
     end
 
     # -> item
-    def confirm_item_2_wait_item(vs_mode_id,item) do 
+    def confirm_item_2_wait_item(now,vs_mode_id,item) do 
         item = put_in(item.user_data,nil)
-        item=%{item| is_confirmed: false}
+        item=%{item| 
+            is_confirmed: false,
+            start_wait_time: now
+        }
         active_request(vs_mode_id,item)
         item 
     end
@@ -343,14 +386,14 @@ defmodule  Game.Global.MatchRoomHelper do
                                     {[x|acc1],acc2}
                                 true -> 
                                     #item2超时了，item1放回到重新等等队列中，进行再次匹配，item2丢弃
-                                    item1= confirm_item_2_wait_item(vs_mode_id,item1)
+                                    item1= confirm_item_2_wait_item(now,vs_mode_id,item1)
                                     {acc1,[item1| acc2]}
                             end
                         true -> 
                             case timeout2 do 
                                 false -> 
                                      #item1超时了，item2放回到重新等等队列中，进行再次匹配，item1丢弃
-                                    item2 = confirm_item_2_wait_item(vs_mode_id,item2)
+                                    item2 = confirm_item_2_wait_item(now,vs_mode_id,item2)
                                     {acc1,[item2| acc2]}
                                 true -> 
                                     ##都超时了，全都丢弃掉
