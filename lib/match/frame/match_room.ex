@@ -126,6 +126,11 @@ defmodule Game.Global.MatchRoom do
       {:reply,reply,state}
   end
 
+  def handle_call({:get_play_with_robot_room_user_cnt},_from,state) do 
+      reply= length(state.playing_with_robot_list)
+      {:reply, reply,state}
+  end
+
 
   def handle_call(_msg, _from, state) do
     {:noreply, state}
