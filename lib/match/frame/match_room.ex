@@ -122,14 +122,19 @@ defmodule Game.Global.MatchRoom do
 
 
   def handle_call({:get_room_user_cnt},_from,state) do 
-      reply= state.user_cnt
+      reply= %{
+        total_cnt: state.user_cnt,
+        playing_with_robot_cnt: length(state.playing_with_robot_list),
+        wait_cnt: length(state.wait_list),
+        playing_with_user_cnt: length(state.playing_list)
+      }
       {:reply,reply,state}
   end
 
-  def handle_call({:get_play_with_robot_room_user_cnt},_from,state) do 
-      reply= length(state.playing_with_robot_list)
-      {:reply, reply,state}
-  end
+  # def handle_call({:get_play_with_robot_room_user_cnt},_from,state) do 
+  #     reply= length(state.playing_with_robot_list)
+  #     {:reply, reply,state}
+  # end
 
 
   def handle_call(_msg, _from, state) do
