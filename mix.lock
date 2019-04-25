@@ -1,3 +1,3 @@
 %{
-  "elx__slib": {:git, "https://github.com/kvine/elx__slib", "92a9e06948736febf5847171c6a8f060e9e5f0b9", [branch: "strip_globalmatch"]},
+  "elx__slib": {:git, "https://github.com/kvine/elx__slib", "f9cdace606bfdf26c64c77214ead130bc87ed556", [branch: "master"]},
 }

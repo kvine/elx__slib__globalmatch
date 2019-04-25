@@ -434,7 +434,7 @@ defmodule  Game.Global.MatchRoomHelper do
         playing_with_robot_list= delete_unactive_item(vs_mode_id,state.playing_with_robot_list)
         ## 匹配的相关参数
         args=%{user_cnt: state.user_cnt}
-        {wait_list,confirm_list, confirm_with_robot_list }= Game.Global.Match.match(vs_mode_id,wait_list,args) 
+        {wait_list, confirm_list, confirm_with_robot_list, extra_data }= Game.Global.Match.match(vs_mode_id,wait_list,args,state.extra_data) 
         confirm_list = Enum.concat(confirm_list,state.confirm_list)
         confirm_with_robot_list = Enum.concat(confirm_with_robot_list,state.confirm_with_robot_list)
         ## 重启定时器
@@ -459,7 +459,8 @@ defmodule  Game.Global.MatchRoomHelper do
                         playing_list: playing_list,
                         playing_with_robot_list: playing_with_robot_list,
                         handle_timer: handle_timer,
-                        user_cnt: user_cnt
+                        user_cnt: user_cnt,
+                        extra_data: extra_data
                         }}
     end
 

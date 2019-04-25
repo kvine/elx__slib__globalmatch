@@ -81,7 +81,10 @@ defmodule Game.Global.MatchRoom do
             playing_with_robot_list: [], #和robot进行比赛的游戏中的玩家队列
             handle_timer: Time.Util.start_timer(mr_handle_timer_time,:handle_timer), ## 处理定时器（每5s做一次处理）
             confirm_timer: Time.Util.start_timer(mr_confirm_timer_time,:confirm_timer), # 检测confirm超时定时器
-            user_cnt: 0 # 当前房间的用户数
+            user_cnt: 0, # 当前房间的用户数
+            extra_data: %{  #一些额外数据（如匹配时间等）
+              match_time: %{}
+            }
             }}
   end
 
@@ -131,10 +134,19 @@ defmodule Game.Global.MatchRoom do
       {:reply,reply,state}
   end
 
-  # def handle_call({:get_play_with_robot_room_user_cnt},_from,state) do 
-  #     reply= length(state.playing_with_robot_list)
-  #     {:reply, reply,state}
-  # end
+  
+  def handle_call({:get_match_room_data},_from,state) do 
+      reply= %{
+        total_cnt: state.user_cnt,
+        playing_with_robot_cnt: length(state.playing_with_robot_list),
+        wait_cnt: length(state.wait_list),
+        playing_with_user_cnt: length(state.playing_list),
+        extra_data: state.extra_data
+      }
+      {:reply,reply,state}
+  end
+
+  
 
 
   def handle_call(_msg, _from, state) do

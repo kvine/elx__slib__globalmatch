@@ -11,8 +11,8 @@ defmodule Game.Global.MatchRoom.Supervisor do
 
     def init(module) do
         ## 初始化所有的模式
-        #获取所有的模式id
-        vs_mode_ids=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+        #获取所有的模式id, 目前设置50个足够用了
+        vs_mode_ids= 0..49
         # vs_mode_ids=[0,1]
         children=  for i<- vs_mode_ids do 
                     id= Game.Global.MatchRoom.name(i)
